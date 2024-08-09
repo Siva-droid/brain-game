@@ -1,3 +1,18 @@
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: 'YOUR_API_KEY',
+    authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
+    databaseURL: 'https://YOUR_PROJECT_ID.firebaseio.com',
+    projectId: 'YOUR_PROJECT_ID',
+    storageBucket: 'YOUR_PROJECT_ID.appspot.com',
+    messagingSenderId: 'YOUR_SENDER_ID',
+    appId: 'YOUR_APP_ID'
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database(app);
+
 document.getElementById('start-button').addEventListener('click', startGame);
 document.getElementById('next-challenge').addEventListener('click', nextChallenge);
 document.getElementById('restart-button').addEventListener('click', restartGame);
@@ -36,6 +51,17 @@ function showResults() {
                           rightScore > leftScore ? 'You are a Right-Brain Thinker!' :
                           'You are Balanced!';
     document.getElementById('result-message').textContent = resultMessage;
+
+    // Save results to Firebase
+    const playerId = generateUniqueId(); // Function to generate a unique ID for each player
+    database.ref('players/' + playerId).set({
+        score: leftScore > rightScore ? 'Left' : (rightScore > leftScore ? 'Right' : 'Balanced'),
+        timestamp: new Date().toISOString()
+    });
+}
+
+function generateUniqueId() {
+    return 'player-' + Math.random().toString(36).substr(2, 9);
 }
 
 function restartGame() {
